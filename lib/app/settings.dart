@@ -17,6 +17,7 @@ class Setting extends StatefulWidget {
 
 class SettingState extends State<Setting> {
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _key = GlobalKey(); // Create a key
 
   static CrudHelper crudHelper;
   UserData userData;
@@ -43,8 +44,14 @@ class SettingState extends State<Setting> {
       return Wrapper();
     }
     return Scaffold(
+      key: _key,
       appBar: AppBar(
-          leading: Icon(Icons.settings),
+          leading: IconButton(
+            icon: Icon(
+              Icons.settings,
+            ),
+            onPressed: () => _key.currentState.openDrawer(),
+          ),
           title: Text("Settings"),
           actions: <Widget>[
             Row(
@@ -83,16 +90,15 @@ class SettingState extends State<Setting> {
                       Form(
                         key: _formKey,
                         child: Column(children: <Widget>[
-
                           Container(
                             padding: EdgeInsets.all(10.0),
                             child: Text('App settings',
-                                style: localTheme.textTheme.headlineLarge),
+                                style: localTheme.textTheme.headlineMedium),
                           ),
 
                           Row(children: <Widget>[
                             Text("Enforce stock checking",
-                                style: localTheme.textTheme.headlineMedium),
+                                style: localTheme.textTheme.bodyMedium),
                             Checkbox(
                                 value: this.checkStock,
                                 onChanged: (bool val) {
@@ -103,7 +109,7 @@ class SettingState extends State<Setting> {
                           Container(
                             padding: EdgeInsets.all(10.0),
                             child: Text('Account settings',
-                                style: localTheme.textTheme.headlineLarge),
+                                style: localTheme.textTheme.bodyMedium),
                           ),
                           SizedBox(height: 20.0),
                           TextFormField(
@@ -138,7 +144,7 @@ class SettingState extends State<Setting> {
                               flex: 1,
                               child: Container(
                                   child: Text('Roles',
-                                      style: localTheme.textTheme.headlineLarge)),
+                                      style: localTheme.textTheme.bodyMedium)),
                             ),
                             RaisedButton(
                                 color: Colors.blue[400],
@@ -265,75 +271,79 @@ class SettingState extends State<Setting> {
               ),
               content: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Form(
-                      key: _roleFormKey,
-                      child: ListView(children: <Widget>[
-                        TextFormField(
-                            initialValue: email ?? '',
-                            decoration: InputDecoration(
-                              labelText: "Email",
-                            ),
-                            onChanged: (val) => setState(() => email = val),
-                            validator: (val) {
-                              if (val?.isEmpty ?? false) {
-                                return "Please fill this field";
-                              } else {
-                                return null;
-                              }
-                            }),
-                        SizedBox(width: 20.0),
-                        TextFormField(
-                            initialValue: role ?? '',
-                            decoration: InputDecoration(
-                              labelText: "Role",
-                            ),
-                            onChanged: (val) => setState(() => role = val),
-                            validator: (val) {
-                              if (val?.isEmpty ?? false) {
-                                return "Please fill this field";
-                              } else {
-                                return null;
-                              }
-                            }),
-                        SizedBox(width: 20.0),
-                        RaisedButton(
-                            color: Colors.blue[400],
-                            child: Text(
-                              'Add',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: () async {
-                              if (_roleFormKey.currentState.validate()) {
-                                if (this.userData.roles == null) {
-                                  this.userData.roles = Map();
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 1.2,
+                    height: MediaQuery.of(context).size.height / 3,
+                    child: Form(
+                        key: _roleFormKey,
+                        child: ListView(children: <Widget>[
+                          TextFormField(
+                              initialValue: email ?? '',
+                              decoration: InputDecoration(
+                                labelText: "Email",
+                              ),
+                              onChanged: (val) => setState(() => email = val),
+                              validator: (val) {
+                                if (val?.isEmpty ?? false) {
+                                  return "Please fill this field";
+                                } else {
+                                  return null;
                                 }
-                                this.userData.roles[email] = role;
-                                print(
-                                    "updating this.userData ${this.userData.roles}");
-                                crudHelper.updateUserData(this.userData);
-                                setState(() => Navigator.pop(context));
-                              }
-                            }),
-                        RaisedButton(
-                            color: Colors.red[400],
-                            child: Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: () async {
-                              if (_roleFormKey.currentState.validate()) {
-                                if (this.userData.roles.containsKey(email)) {
-                                  this.userData.roles.remove(email);
+                              }),
+                          SizedBox(width: 20.0),
+                          TextFormField(
+                              initialValue: role ?? '',
+                              decoration: InputDecoration(
+                                labelText: "Role",
+                              ),
+                              onChanged: (val) => setState(() => role = val),
+                              validator: (val) {
+                                if (val?.isEmpty ?? false) {
+                                  return "Please fill this field";
+                                } else {
+                                  return null;
+                                }
+                              }),
+                          SizedBox(width: 20.0),
+                          RaisedButton(
+                              color: Colors.blue[400],
+                              child: Text(
+                                'Add',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                if (_roleFormKey.currentState.validate()) {
+                                  if (this.userData.roles == null) {
+                                    this.userData.roles = Map();
+                                  }
+                                  this.userData.roles[email] = role;
+                                  print(
+                                      "updating this.userData ${this.userData.roles}");
                                   crudHelper.updateUserData(this.userData);
+                                  setState(() => Navigator.pop(context));
                                 }
-                                role = '';
-                                email = '';
-                                setState(() => Navigator.pop(context));
-                              } else {
-                                setState(() => Navigator.pop(context));
-                              }
-                            }),
-                      ]))));
+                              }),
+                          RaisedButton(
+                              color: Colors.red[400],
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                if (_roleFormKey.currentState.validate()) {
+                                  if (this.userData.roles.containsKey(email)) {
+                                    this.userData.roles.remove(email);
+                                    crudHelper.updateUserData(this.userData);
+                                  }
+                                  role = '';
+                                  email = '';
+                                  setState(() => Navigator.pop(context));
+                                } else {
+                                  setState(() => Navigator.pop(context));
+                                }
+                              }),
+                        ])),
+                  )));
         });
   }
 }

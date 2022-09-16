@@ -121,7 +121,7 @@ class _StockEntryFormState extends State<StockEntryForm> {
   }
 
   Widget buildForm(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.headlineLarge;
+    TextStyle textStyle = Theme.of(context).textTheme.bodyMedium;
 
     return Column(children: <Widget>[
       DropdownButton<String>(

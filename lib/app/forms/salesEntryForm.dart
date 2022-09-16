@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -85,11 +87,15 @@ class _SalesEntryFormState extends State<SalesEntryForm> {
     }
     if (this.widget.swipeData != null) {
       Item item = this.widget.swipeData;
+      log('this.widget.swipeData===>${this.widget.swipeData}');
       this.units = item.units?.keys?.toList() ?? List();
       if (this.units.isNotEmpty) {
         this.units.add('');
       }
     }
+
+    
+      log("now this transaction item id ==>${this.transaction.itemId}");
 
     if (this.transaction.id != null) {
       debugPrint("Getting transaction obj");
@@ -129,7 +135,7 @@ class _SalesEntryFormState extends State<SalesEntryForm> {
   }
 
   Widget buildForm(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.headlineLarge;
+    TextStyle textStyle = Theme.of(context).textTheme.bodyMedium;
 
     debugPrint("making build form");
     return Column(children: <Widget>[
@@ -410,10 +416,14 @@ class _SalesEntryFormState extends State<SalesEntryForm> {
     }
 
     Item item;
+
     if (this.widget.swipeData != null) {
       debugPrint("Using swipeData to save");
       item = this.widget.swipeData;
+
     } else {
+                log(' this.tempItem ID===>${this.tempItemId}');
+
       item = await crudHelper
           .getItemById(
         this.tempItemId,

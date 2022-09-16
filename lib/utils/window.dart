@@ -137,7 +137,7 @@ class WindowUtils {
             labelText: labelText,
             labelStyle: textStyle,
             hintText: hintText,
-            errorStyle: TextStyle(color: Colors.redAccent, fontSize: 15.0),
+            errorStyle: TextStyle(color: Colors.redAccent, fontSize: 10.0),
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
       ), // Textfield

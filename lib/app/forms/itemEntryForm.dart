@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -84,7 +86,7 @@ class _ItemEntryFormState extends State<ItemEntryForm> {
   }
 
   Widget buildForm(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.headlineLarge;
+    TextStyle textStyle = Theme.of(context).textTheme.bodyMedium;
 
     return Column(children: <Widget>[
       DropdownButton<String>(
@@ -321,6 +323,7 @@ class _ItemEntryFormState extends State<ItemEntryForm> {
       message = "Permission Denied";
     }
 
+    log("MAHAMMAD - _save ===>");
     if (this.item.name == '' || this.stringUnderNickName != '') {
       // item name is set to '' if its duplicate in above function updateIteName
       message = "Name or Nick name already registered";
@@ -335,6 +338,8 @@ class _ItemEntryFormState extends State<ItemEntryForm> {
         this.item.used += 1;
         crudHelper.updateItem(this.item);
       } else {
+        log("MAHAMMAD - Add Item Called ===>");
+
         // Case 2: Insert operation
         crudHelper.addItem(this.item);
       }
@@ -456,74 +461,79 @@ class _ItemEntryFormState extends State<ItemEntryForm> {
               ),
               content: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Form(
-                      key: _unitFormKey,
-                      child: ListView(children: <Widget>[
-                        TextFormField(
-                            initialValue: name ?? '',
-                            decoration: InputDecoration(
-                              labelText: "Unit name",
-                            ),
-                            onChanged: (val) => setState(() => name = val),
-                            validator: (val) {
-                              if (val?.isEmpty ?? false) {
-                                return "Please fill this field";
-                              } else {
-                                return null;
-                              }
-                            }),
-                        SizedBox(width: 20.0),
-                        TextFormField(
-                            initialValue:
-                                FormUtils.fmtToIntIfPossible(quantity),
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: "Quantity",
-                            ),
-                            validator: (val) {
-                              if (val?.isEmpty ?? false) {
-                                return "Please fill this field";
-                              }
-                              try {
-                                quantity = double.parse(val).abs();
-                                return null;
-                              } catch (e) {
-                                return "Invalid value";
-                              }
-                            }),
-                        SizedBox(width: 20.0),
-                        RaisedButton(
-                            color: Colors.blue[400],
-                            child: Text(
-                              'Add',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: () async {
-                              if (_unitFormKey.currentState.validate()) {
-                                if (this.item.units == null) {
-                                  this.item.units = Map();
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width / 1.2,
+                    height: MediaQuery.of(context).size.height / 3,
+                    child: Form(
+                        key: _unitFormKey,
+                        child: ListView(children: <Widget>[
+                          TextFormField(
+                              initialValue: name ?? '',
+                              decoration: InputDecoration(
+                                labelText: "Unit name",
+                              ),
+                              onChanged: (val) => setState(() => name = val),
+                              validator: (val) {
+                                if (val?.isEmpty ?? false) {
+                                  return "Please fill this field";
+                                } else {
+                                  return null;
                                 }
-                                this.item.units[name] = quantity;
-                                print("Updating this item ${this.item.units}");
+                              }),
+                          SizedBox(width: 20.0),
+                          TextFormField(
+                              initialValue:
+                                  FormUtils.fmtToIntIfPossible(quantity),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: "Quantity",
+                              ),
+                              validator: (val) {
+                                if (val?.isEmpty ?? false) {
+                                  return "Please fill this field";
+                                }
+                                try {
+                                  quantity = double.parse(val).abs();
+                                  return null;
+                                } catch (e) {
+                                  return "Invalid value";
+                                }
+                              }),
+                          SizedBox(height: 20.0),
+                          RaisedButton(
+                              color: Colors.blue[400],
+                              child: Text(
+                                'Add',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                if (_unitFormKey.currentState.validate()) {
+                                  if (this.item.units == null) {
+                                    this.item.units = Map();
+                                  }
+                                  this.item.units[name] = quantity;
+                                  print(
+                                      "Updating this item ${this.item.units}");
+                                  setState(() => Navigator.pop(context));
+                                }
+                              }),
+                          RaisedButton(
+                              color: Colors.red[400],
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                if (this.item.units.containsKey(name)) {
+                                  this.item.units.remove(name);
+                                }
+                                quantity =
+                                    null; // it will be formatted to '' in TextField
+                                name = '';
                                 setState(() => Navigator.pop(context));
-                              }
-                            }),
-                        RaisedButton(
-                            color: Colors.red[400],
-                            child: Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: () async {
-                              if (this.item.units.containsKey(name)) {
-                                this.item.units.remove(name);
-                              }
-                              quantity =
-                                  null; // it will be formatted to '' in TextField
-                              name = '';
-                              setState(() => Navigator.pop(context));
-                            }),
-                      ]))));
+                              }),
+                        ])),
+                  )));
         });
   }
 }

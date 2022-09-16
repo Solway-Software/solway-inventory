@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'package:bk_app/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -14,6 +16,12 @@ class CrudHelper {
   // Item
   Future<int> addItem(Item item) async {
     String targetEmail = this.userData.targetEmail;
+
+    log("targetEmail ===>$targetEmail");
+    log("item costPrice ===>${item.costPrice}");
+    log("item units ===>${item.units}");
+    log("item markedPrice ===>${item.markedPrice}");
+
     if (targetEmail == this.userData.email) {
       await FirebaseFirestore.instance
           .collection('$targetEmail-items')
@@ -30,6 +38,10 @@ class CrudHelper {
 
   Future<int> updateItem(Item newItem) async {
     String targetEmail = this.userData.targetEmail;
+    log("targetEmail ===>$targetEmail");
+    log("item costPrice ===>${newItem.costPrice}");
+    log("item units ===>${newItem.units}");
+    log("item markedPrice ===>${newItem.markedPrice}");
     if (targetEmail == this.userData.email) {
       await FirebaseFirestore.instance
           .collection('$targetEmail-items')
@@ -150,6 +162,7 @@ class CrudHelper {
   Future<List<ItemTransaction>> getPendingTransactions() async {
     String email = this.userData.targetEmail;
     UserData user = await this.getUserData('email', email);
+    log('getPendingTransactions user==>${user.uid}');
     List roles = user.roles?.keys?.toList() ?? List();
     print("roles $roles");
     if (roles.isEmpty) return List<ItemTransaction>();
@@ -178,22 +191,30 @@ class CrudHelper {
         .catchError((e) {
       return null;
     });
+
     if (userDataSnapshots.docs.isEmpty) {
+      log('userDataSnapshots is empty !');
+
       return null;
     }
-    DocumentSnapshot userDataSnapshot = userDataSnapshots.docs.first;
-    if (userDataSnapshot.data()) {
-      UserData userData = UserData.fromMapObject(userDataSnapshot.data());
-      userData.uid = userDataSnapshot.id;
-      return userData;
-    } else {
-      return null;
-    }
+
+    QueryDocumentSnapshot<Object> userDataSnapshot = userDataSnapshots.docs.first;
+
+    // if (userDataSnapshot.exists) {
+
+    log('hattttt');
+
+    return  UserData.fromMapObject(userDataSnapshot.data());
+    // } else {
+    //   return null;
+    // }
   }
 
   Future<UserData> getUserDataByUid(String uid) async {
-    DocumentSnapshot _userData =
-        await FirebaseFirestore.instance.doc('users/$uid').get().catchError((e) {
+    DocumentSnapshot _userData = await FirebaseFirestore.instance
+        .doc('users/$uid')
+        .get()
+        .catchError((e) {
       print("error getting userdata $e");
       return null;
     });
